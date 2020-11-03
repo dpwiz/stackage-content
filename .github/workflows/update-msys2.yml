@@ -1,0 +1,39 @@
+name: Update MSYS2
+
+on:
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs: []
+
+jobs:
+  create_release:
+    name: Create a new MSYS2 release
+    runs-on: windows-2019
+    
+    steps:
+    - name: Download 32-bit release
+      uses: carlosperate/download-file-action@v1.0.3
+      id: download-32
+      with:
+        file-url: 'http://repo.msys2.org/distrib/msys2-i686-latest.exe'
+
+    - name: Install 32-bit
+      run: "${{ steps.download-32.outputs.file-path }}"
+      id: install-32
+
+    - name: Download 64-bit release
+      uses: carlosperate/download-file-action@v1.0.3
+      id: download-64
+      with:
+        file-url: 'http://repo.msys2.org/distrib/msys2-x86_64-latest.exe'
+      
+    - name: Install 64-bit
+      run: "${{ steps.download-64.outputs.file-path }}"
+      id: install-64
+
+    - name: Pack up
+      run: |
+        cd /c/
+        dir
+        tar cJf msys2-YYYYMMDD-x86_64.tar.xz msys64
+        tar cJf msys2-YYYYMMDD-i686.tar.xz msys32
